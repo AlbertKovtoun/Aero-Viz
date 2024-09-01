@@ -10,7 +10,7 @@ export class Particles {
   }
 
   setParticles() {
-    const particleCount = 1000
+    const particleCount = 10000
 
     const geometry = new THREE.BufferGeometry()
 
@@ -21,7 +21,7 @@ export class Particles {
 
     const color = new THREE.Color()
 
-    const n = 2,
+    const n = 20,
       n2 = n / 2 // particles spread in the sphere + put sphere in center
 
     for (let i = 0; i < particleCount; i++) {

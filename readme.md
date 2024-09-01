@@ -1,4 +1,4 @@
-# Vite config for modern web projects + three.js
+# Aero Viz
 
 ## Setup
 
@@ -15,4 +15,4 @@ npm run dev
 npm run build
 ```
 
-Made by Albert Kovtoun
+Made by Albert Kovtoun and Lars Moons
