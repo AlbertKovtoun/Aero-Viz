@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { flights } from "../data"
 import Stats from "stats.js"
 
 import { Camera } from "./Camera"
@@ -6,12 +7,9 @@ import { Renderer } from "./Renderer"
 import { Sizes } from "./Sizes"
 import { Loaders } from "./Loaders"
 
-import defaultVertexShader from "../../shaders/default/vertex.glsl?raw"
-import defaultFragmentShader from "../../shaders/default/fragment.glsl?raw"
 import { Particles } from "./Particles"
 import { PostProcessing } from "./PostProcessing"
 import { Earth } from "./Earth"
-import { flights } from "../data"
 
 const waitForFlights = setInterval(() => {
   if (flights) {
@@ -31,21 +29,6 @@ export const canvas = document.querySelector("canvas.webgl")
 export const scene = new THREE.Scene()
 
 export const loaders = new Loaders()
-
-const plane = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 2),
-  new THREE.ShaderMaterial({
-    vertexShader: defaultVertexShader,
-    fragmentShader: defaultFragmentShader,
-    side: THREE.DoubleSide,
-    //transparent: true,
-
-    uniforms: {
-      uTexture: { value: loaders.textureLoader.load("/images/render.jpg") },
-    },
-  }),
-)
-scene.add(plane)
 
 export const earth = new Earth()
 

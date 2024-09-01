@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { scene } from "./Experience"
+import { loaders, scene } from "./Experience"
 
 export class Earth {
   constructor() {
@@ -7,11 +7,15 @@ export class Earth {
   }
 
   setEarth() {
+    this.texture = loaders.textureLoader.load("/textures/earth.jpg")
+    this.texture.colorSpace = THREE.SRGBColorSpace
+
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 32, 32),
-      new THREE.MeshBasicMaterial({ color: "blue" }),
+      new THREE.MeshBasicMaterial({
+        map: this.texture,
+      }),
     )
-    this.earth.position.x = 2
     scene.add(this.earth)
   }
 }
