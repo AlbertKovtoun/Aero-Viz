@@ -11,6 +11,16 @@ import defaultFragmentShader from "../../shaders/default/fragment.glsl?raw"
 import { Particles } from "./Particles"
 import { PostProcessing } from "./PostProcessing"
 import { Earth } from "./Earth"
+import { flights } from "../data"
+
+const waitForFlights = setInterval(() => {
+  if (flights) {
+    console.log(flights)
+    clearInterval(waitForFlights)
+  } else {
+    console.log("Waiting for flight data...")
+  }
+}, 100)
 
 const stats = new Stats()
 stats.showPanel(0) // 0: fps, 1: ms, 2: mb, 3+: custom
