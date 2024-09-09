@@ -39,11 +39,11 @@ export class Flights {
       this.flight = new THREE.Mesh(this.flightGeometry, this.flightMaterial)
 
       const { x, y, z } = this.latLongToVector3(
-        flightsArray[i]["arrival.lat"],
-        flightsArray[i]["arrival.lng"],
+        flightsArray[i].arrival.lat,
+        flightsArray[i].arrival.lng,
         1
       )
-      this.flight.position.set(x, y, z)
+      this.flight.position.set(x, y, z + Math.random() * 0.1)
       scene.add(this.flight)
     }
   }
