@@ -6,7 +6,6 @@ import { Renderer } from "./Renderer"
 import { Sizes } from "./Sizes"
 import { Loaders } from "./Loaders"
 
-import { Particles } from "./Particles"
 import { PostProcessing } from "./PostProcessing"
 import { Earth } from "./Earth"
 import { Flights } from "./Flights"
@@ -24,8 +23,6 @@ export const loaders = new Loaders()
 export const flights = new Flights()
 
 export const earth = new Earth()
-
-// export const particles = new Particles()
 
 export const sizes = new Sizes()
 
@@ -54,9 +51,9 @@ const tick = () => {
   // Render
   renderer.renderer.render(scene, camera.camera)
 
-  // setTimeout(() => {
+  //setTimeout(() => {
   window.requestAnimationFrame(tick)
-  // }, 1000 / 30)
+  //}, 1000 / 60)
 
   stats.end()
 }
