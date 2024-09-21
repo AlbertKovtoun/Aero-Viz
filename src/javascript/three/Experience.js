@@ -51,9 +51,9 @@ const tick = () => {
   // Render
   renderer.renderer.render(scene, camera.camera)
 
-  setTimeout(() => {
-    window.requestAnimationFrame(tick)
-  }, 1000 / 60)
+  //setTimeout(() => {
+  window.requestAnimationFrame(tick)
+  //}, 1000 / 60)
 
   stats.end()
 }

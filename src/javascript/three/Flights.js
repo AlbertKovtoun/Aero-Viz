@@ -39,7 +39,7 @@ export class Flights {
     const flightsCount = flightsArray.length
 
     this.flightGeometry = new THREE.SphereGeometry(0.005, 4, 4)
-    this.flightMaterial = new THREE.MeshBasicMaterial({ color: "#ff0000" })
+    this.flightMaterial = new THREE.MeshBasicMaterial({ color: "yellow" })
 
     this.flightsInstance = new THREE.InstancedMesh(
       this.flightGeometry,
