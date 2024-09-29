@@ -8,7 +8,6 @@ import { scene } from "./Experience"
 export class Flights {
   constructor() {
     this.radius = 1.05
-    this.duration = 10
     this.loadFlightData()
   }
 
@@ -51,30 +50,29 @@ export class Flights {
     this.arrivalPositions = []
     this.rotationAxes = []
     this.rotationAngles = []
-    this.flightProgresses = new Float32Array(flightsCount) // Stores progress (t) for each flight
-
+    this.flightProgresses = new Float32Array(flightsCount)
     this.flightDummy = new THREE.Object3D()
 
     for (let i = 0; i < flightsCount; i++) {
       const flight = flightsArray[i]
 
-      // Calculate departure and arrival positions
+      const randomAltitude = Math.random() * 0.1
+
       const departure = this.latLongToVector3(
         flight.departure.lat,
         flight.departure.lng,
-        this.radius,
-      ).normalize()
+        this.radius + randomAltitude,
+      )
 
       const arrival = this.latLongToVector3(
         flight.arrival.lat,
         flight.arrival.lng,
-        this.radius,
-      ).normalize()
+        this.radius + randomAltitude,
+      )
 
       this.departurePositions.push(departure)
       this.arrivalPositions.push(arrival)
 
-      // Calculate rotation axis and angle for spherical movement
       const rotationAxis = new THREE.Vector3()
         .crossVectors(departure, arrival)
         .normalize()
@@ -83,10 +81,8 @@ export class Flights {
       this.rotationAxes.push(rotationAxis)
       this.rotationAngles.push(rotationAngle)
 
-      // Initialize flight progress
       this.flightProgresses[i] = 0
 
-      // Set initial instance matrix
       this.flightDummy.position.copy(
         departure.clone().multiplyScalar(this.radius),
       )
@@ -101,55 +97,42 @@ export class Flights {
 
   animateFlights() {
     const flightsCount = this.departurePositions.length
-    const duration = this.duration * 1000
 
-    this.timeline = gsap.timeline({ repeat: -1 })
+    this.durations = []
 
-    // Add an onUpdate callback to the timeline
-    this.timeline.to(
-      { progress: 0 },
-      {
-        progress: 1,
-        duration: this.duration,
-        ease: "linear",
-        onUpdate: () => {
-          const tGlobal = this.timeline.progress()
+    for (let i = 0; i < flightsCount; i++) {
+      const randomDuration = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
+      this.durations.push(randomDuration)
+    }
 
-          // Update all flights
-          for (let i = 0; i < flightsCount; i++) {
-            // Update flight progress
-            this.flightProgresses[i] = tGlobal
+    for (let i = 0; i < flightsCount; i++) {
+      this.animateFlight(i)
+    }
+  }
 
-            // Calculate current rotation angle
-            const rotationAngle =
-              this.rotationAngles[i] * this.flightProgresses[i]
+  animateFlight(flightIndex) {
+    const flightDuration = this.durations[flightIndex]
 
-            // Rotate the departure position around the rotation axis
-            const currentPosition = this.departurePositions[i]
-              .clone()
-              .applyAxisAngle(this.rotationAxes[i], rotationAngle)
-              .multiplyScalar(this.radius)
+    gsap.to(this.flightProgresses, {
+      [flightIndex]: 1,
+      duration: flightDuration,
+      repeat: -1,
+      ease: "power4.inOut",
+      onUpdate: () => {
+        const rotationAngle =
+          this.rotationAngles[flightIndex] * this.flightProgresses[flightIndex]
 
-            // Update instance matrix
-            this.flightDummy.position.copy(currentPosition)
+        const currentPosition = this.departurePositions[flightIndex]
+          .clone()
+          .applyAxisAngle(this.rotationAxes[flightIndex], rotationAngle)
+          .multiplyScalar(this.radius)
 
-            // Optional: Orient the plane along its path
-            const nextRotationAngle =
-              this.rotationAngles[i] * (this.flightProgresses[i] + 0.001)
-            const nextPosition = this.departurePositions[i]
-              .clone()
-              .applyAxisAngle(this.rotationAxes[i], nextRotationAngle)
-              .multiplyScalar(this.radius)
-            this.flightDummy.lookAt(nextPosition)
+        this.flightDummy.position.copy(currentPosition)
+        this.flightDummy.updateMatrix()
+        this.flightsInstance.setMatrixAt(flightIndex, this.flightDummy.matrix)
 
-            this.flightDummy.updateMatrix()
-            this.flightsInstance.setMatrixAt(i, this.flightDummy.matrix)
-          }
-
-          // Indicate that instance matrices need an update
-          this.flightsInstance.instanceMatrix.needsUpdate = true
-        },
+        this.flightsInstance.instanceMatrix.needsUpdate = true
       },
-    )
+    })
   }
 }
