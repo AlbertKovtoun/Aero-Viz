@@ -5,9 +5,12 @@ import { gsap } from "gsap"
 import { flightsArray } from "../data"
 import { scene } from "./Experience"
 
+import flightVertexShader from "../../shaders/flight/vertex.glsl?raw"
+import flightFragmentShader from "../../shaders/flight/fragment.glsl?raw"
+
 export class Flights {
   constructor() {
-    this.radius = 1.05
+    this.radius = 1.02
     this.loadFlightData()
   }
 
@@ -38,7 +41,10 @@ export class Flights {
     const flightsCount = flightsArray.length
 
     this.flightGeometry = new THREE.SphereGeometry(0.005, 4, 4)
-    this.flightMaterial = new THREE.MeshBasicMaterial({ color: "yellow" })
+    this.flightMaterial = new THREE.ShaderMaterial({
+      vertexShader: flightVertexShader,
+      fragmentShader: flightFragmentShader,
+    })
 
     this.flightsInstance = new THREE.InstancedMesh(
       this.flightGeometry,
@@ -51,6 +57,10 @@ export class Flights {
     this.rotationAxes = []
     this.rotationAngles = []
     this.flightProgresses = new Float32Array(flightsCount)
+
+    this.flightColors = new Float32Array(flightsCount * 3)
+    this.flightTempColor = new THREE.Color()
+
     this.flightDummy = new THREE.Object3D()
 
     for (let i = 0; i < flightsCount; i++) {
@@ -83,6 +93,11 @@ export class Flights {
 
       this.flightProgresses[i] = 0
 
+      this.flightTempColor.set(Math.random(), Math.random(), Math.random())
+      this.flightColors[i * 3 + 0] = this.flightTempColor.r
+      this.flightColors[i * 3 + 1] = this.flightTempColor.g
+      this.flightColors[i * 3 + 2] = this.flightTempColor.b
+
       this.flightDummy.position.copy(
         departure.clone().multiplyScalar(this.radius),
       )
@@ -90,12 +105,17 @@ export class Flights {
       this.flightsInstance.setMatrixAt(i, this.flightDummy.matrix)
     }
 
+    this.flightsInstance.geometry.setAttribute(
+      "aInstanceColor",
+      new THREE.InstancedBufferAttribute(this.flightColors, 3),
+    )
+
     scene.add(this.flightsInstance)
 
-    this.animateFlights()
+    this.updateFlights()
   }
 
-  animateFlights() {
+  updateFlights() {
     const flightsCount = this.departurePositions.length
 
     this.durations = []
@@ -106,11 +126,11 @@ export class Flights {
     }
 
     for (let i = 0; i < flightsCount; i++) {
-      this.animateFlight(i)
+      this.updateFlight(i)
     }
   }
 
-  animateFlight(flightIndex) {
+  updateFlight(flightIndex) {
     const flightDuration = this.durations[flightIndex]
 
     gsap.to(this.flightProgresses, {
