@@ -9,6 +9,10 @@ import { Loaders } from "./Loaders"
 import { PostProcessing } from "./PostProcessing"
 import { Earth } from "./Earth"
 import { Flights } from "./Flights"
+import { Pane } from "tweakpane"
+import { TimeModule } from "./TimeModule"
+
+const pane = new Pane()
 
 const stats = new Stats()
 stats.showPanel(0)
@@ -31,6 +35,8 @@ export const camera = new Camera()
 export const renderer = new Renderer()
 
 export const postProcessing = new PostProcessing()
+
+export const timeModule = new TimeModule()
 
 //Animate
 const clock = new THREE.Clock()
