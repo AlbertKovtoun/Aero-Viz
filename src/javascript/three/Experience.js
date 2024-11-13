@@ -57,6 +57,9 @@ const tick = () => {
   // Render
   renderer.renderer.render(scene, camera.camera)
 
+  //Update time and timeModule
+  timeModule.update(elapsedTime)
+
   //setTimeout(() => {
   window.requestAnimationFrame(tick)
   //}, 1000 / 30)

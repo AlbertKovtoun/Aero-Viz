@@ -25,6 +25,12 @@ export class Flights {
     return new THREE.Vector3(x, y, z)
   }
 
+  timeToDecimal(time) {
+    const hours = (time.charCodeAt(0) - 48) * 10 + (time.charCodeAt(1) - 48)
+    const minutes = (time.charCodeAt(3) - 48) * 10 + (time.charCodeAt(4) - 48)
+    return (hours * 60 + minutes) / 1440
+  }
+
   loadFlightData() {
     const waitForFlights = setInterval(() => {
       if (flightsArray && flightsArray.length > 0) {
@@ -53,6 +59,7 @@ export class Flights {
     )
 
     this.departurePositions = []
+    this.normalizedDepartureTimes = new Float32Array(flightsCount)
     this.arrivalPositions = []
     this.rotationAxes = []
     this.rotationAngles = []
@@ -73,14 +80,17 @@ export class Flights {
         flight.departure.lng,
         this.radius + randomAltitude,
       )
+      this.departurePositions.push(departure)
+
+      this.normalizedDepartureTimes[i] = this.timeToDecimal(
+        flight.departure.time,
+      )
 
       const arrival = this.latLongToVector3(
         flight.arrival.lat,
         flight.arrival.lng,
         this.radius + randomAltitude,
       )
-
-      this.departurePositions.push(departure)
       this.arrivalPositions.push(arrival)
 
       const rotationAxis = new THREE.Vector3()
@@ -93,7 +103,7 @@ export class Flights {
 
       this.flightProgresses[i] = 0
 
-      this.flightTempColor.set(Math.random(), Math.random(), Math.random())
+      this.flightTempColor.set(Math.random(), 0, 0) //random red tint
       this.flightColors[i * 3 + 0] = this.flightTempColor.r
       this.flightColors[i * 3 + 1] = this.flightTempColor.g
       this.flightColors[i * 3 + 2] = this.flightTempColor.b
