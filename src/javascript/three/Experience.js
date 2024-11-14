@@ -60,9 +60,9 @@ const tick = () => {
   //Update time and timeModule
   timeModule.update(elapsedTime)
 
-  //setTimeout(() => {
-  window.requestAnimationFrame(tick)
-  //}, 1000 / 30)
+  setTimeout(() => {
+    window.requestAnimationFrame(tick)
+  }, 1000 / 30)
 
   stats.end()
 }

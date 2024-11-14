@@ -1,9 +1,7 @@
-// Flights.js
-
 import * as THREE from "three"
 import { gsap } from "gsap"
 import { flightsArray } from "../data"
-import { scene } from "./Experience"
+import { scene, timeModule } from "./Experience"
 
 import flightVertexShader from "../../shaders/flight/vertex.glsl?raw"
 import flightFragmentShader from "../../shaders/flight/fragment.glsl?raw"
@@ -11,6 +9,7 @@ import flightFragmentShader from "../../shaders/flight/fragment.glsl?raw"
 export class Flights {
   constructor() {
     this.radius = 1.02
+    this.activeFlights = new Set()
     this.loadFlightData()
   }
 
@@ -64,6 +63,7 @@ export class Flights {
     this.rotationAxes = []
     this.rotationAngles = []
     this.flightProgresses = new Float32Array(flightsCount)
+    this.durations = new Float32Array(flightsCount)
 
     this.flightColors = new Float32Array(flightsCount * 3)
     this.flightTempColor = new THREE.Color()
@@ -102,6 +102,7 @@ export class Flights {
       this.rotationAngles.push(rotationAngle)
 
       this.flightProgresses[i] = 0
+      this.durations[i] = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
 
       this.flightTempColor.set(Math.random(), 0, 0) //random red tint
       this.flightColors[i * 3 + 0] = this.flightTempColor.r
@@ -122,31 +123,31 @@ export class Flights {
 
     scene.add(this.flightsInstance)
 
-    this.updateFlights()
+    this.checkFlightTimes()
   }
 
-  updateFlights() {
-    const flightsCount = this.departurePositions.length
+  checkFlightTimes() {
+    setInterval(() => {
+      const currentTime = timeModule.globalTimeProgress
 
-    this.durations = []
-
-    for (let i = 0; i < flightsCount; i++) {
-      const randomDuration = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
-      this.durations.push(randomDuration)
-    }
-
-    for (let i = 0; i < flightsCount; i++) {
-      this.updateFlight(i)
-    }
+      for (let i = 0; i < this.departurePositions.length; i++) {
+        if (
+          !this.activeFlights.has(i) &&
+          Math.abs(this.normalizedDepartureTimes[i] - currentTime) < 0.001
+        ) {
+          this.startFlight(i)
+          this.activeFlights.add(i)
+        }
+      }
+    }, 100)
   }
 
-  updateFlight(flightIndex) {
+  startFlight(flightIndex) {
     const flightDuration = this.durations[flightIndex]
 
     gsap.to(this.flightProgresses, {
       [flightIndex]: 1,
       duration: flightDuration,
-      repeat: -1,
       ease: "power4.inOut",
       onUpdate: () => {
         const rotationAngle =
@@ -163,6 +164,20 @@ export class Flights {
 
         this.flightsInstance.instanceMatrix.needsUpdate = true
       },
+      //onComplete: () => {
+      //  // Reset the flight back to departure position
+      //  this.flightProgresses[flightIndex] = 0
+      //  this.activeFlights.delete(flightIndex)
+      //
+      //  const departurePosition = this.departurePositions[flightIndex]
+      //    .clone()
+      //    .multiplyScalar(this.radius)
+      //
+      //  this.flightDummy.position.copy(departurePosition)
+      //  this.flightDummy.updateMatrix()
+      //  this.flightsInstance.setMatrixAt(flightIndex, this.flightDummy.matrix)
+      //  this.flightsInstance.instanceMatrix.needsUpdate = true
+      //},
     })
   }
 }
