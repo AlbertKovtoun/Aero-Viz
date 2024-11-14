@@ -49,6 +49,10 @@ export class Flights {
     this.flightMaterial = new THREE.ShaderMaterial({
       vertexShader: flightVertexShader,
       fragmentShader: flightFragmentShader,
+      uniforms: {
+        uOpacity: { value: new Float32Array(flightsCount) },
+      },
+      transparent: true,
     })
 
     this.flightsInstance = new THREE.InstancedMesh(
@@ -67,6 +71,8 @@ export class Flights {
 
     this.flightColors = new Float32Array(flightsCount * 3)
     this.flightTempColor = new THREE.Color()
+
+    this.flightOpacities = new Float32Array(flightsCount)
 
     this.flightDummy = new THREE.Object3D()
 
@@ -104,10 +110,14 @@ export class Flights {
       this.flightProgresses[i] = 0
       this.durations[i] = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
 
-      this.flightTempColor.set(Math.random(), 0, 0) //random red tint
+      this.flightMaterial.uniforms.uOpacity.value[i] = 0
+
+      this.flightTempColor.set(1, 0, 0) //random red tint
       this.flightColors[i * 3 + 0] = this.flightTempColor.r
       this.flightColors[i * 3 + 1] = this.flightTempColor.g
       this.flightColors[i * 3 + 2] = this.flightTempColor.b
+
+      this.flightOpacities[i] = 0
 
       this.flightDummy.position.copy(
         departure.clone().multiplyScalar(this.radius),
@@ -119,6 +129,11 @@ export class Flights {
     this.flightsInstance.geometry.setAttribute(
       "aInstanceColor",
       new THREE.InstancedBufferAttribute(this.flightColors, 3),
+    )
+
+    this.flightsInstance.geometry.setAttribute(
+      "aOpacity",
+      new THREE.InstancedBufferAttribute(this.flightOpacities, 1),
     )
 
     scene.add(this.flightsInstance)
@@ -145,6 +160,17 @@ export class Flights {
   startFlight(flightIndex) {
     const flightDuration = this.durations[flightIndex]
 
+    // Animate opacity
+    gsap.to(this.flightsInstance.geometry.attributes.aOpacity.array, {
+      [flightIndex]: 1,
+      duration: 1,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        this.flightsInstance.geometry.attributes.aOpacity.needsUpdate = true
+      },
+    })
+
+    //Animate flight
     gsap.to(this.flightProgresses, {
       [flightIndex]: 1,
       duration: flightDuration,

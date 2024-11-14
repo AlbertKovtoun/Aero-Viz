@@ -1,7 +1,9 @@
 attribute vec3 aInstanceColor;
+attribute float aOpacity;
 
 varying vec2 vUv;
 varying vec3 vInstanceColor;
+varying float vOpacity;
 
 void main()
 {
@@ -10,5 +12,6 @@ void main()
 
     vUv = uv;
     vInstanceColor = aInstanceColor;
+    vOpacity = aOpacity;
 }
 
