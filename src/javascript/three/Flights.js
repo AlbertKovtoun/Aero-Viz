@@ -148,7 +148,7 @@ export class Flights {
     gsap.to(this.flightProgresses, {
       [flightIndex]: 1,
       duration: flightDuration,
-      ease: "power4.inOut",
+      ease: "power1.inOut",
       onUpdate: () => {
         const rotationAngle =
           this.rotationAngles[flightIndex] * this.flightProgresses[flightIndex]

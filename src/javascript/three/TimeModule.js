@@ -28,6 +28,10 @@ export class TimeModule {
   }
 
   update(elapsedTime) {
-    this.globalTimeProgress = elapsedTime * 0.01
+    // Make sure it doesn't go past 24h
+    if (this.globalTimeProgress < 1) {
+      this.globalTimeProgress = elapsedTime * 0.01
+    }
+    this.convertProgressToTime(this.globalTimeProgress)
   }
 }
