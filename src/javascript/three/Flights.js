@@ -112,7 +112,7 @@ export class Flights {
 
       this.flightMaterial.uniforms.uOpacity.value[i] = 0
 
-      this.flightTempColor.set(1, 0, 0) //random red tint
+      this.flightTempColor.set(Math.random(), 0, 0) //random red tint
       this.flightColors[i * 3 + 0] = this.flightTempColor.r
       this.flightColors[i * 3 + 1] = this.flightTempColor.g
       this.flightColors[i * 3 + 2] = this.flightTempColor.b
@@ -160,15 +160,7 @@ export class Flights {
   startFlight(flightIndex) {
     const flightDuration = this.durations[flightIndex]
 
-    // Animate opacity
-    gsap.to(this.flightsInstance.geometry.attributes.aOpacity.array, {
-      [flightIndex]: 1,
-      duration: 1,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        this.flightsInstance.geometry.attributes.aOpacity.needsUpdate = true
-      },
-    })
+    this.handleFlightOpacity(flightIndex, 1)
 
     //Animate flight
     gsap.to(this.flightProgresses, {
@@ -190,20 +182,18 @@ export class Flights {
 
         this.flightsInstance.instanceMatrix.needsUpdate = true
       },
-      //onComplete: () => {
-      //  // Reset the flight back to departure position
-      //  this.flightProgresses[flightIndex] = 0
-      //  this.activeFlights.delete(flightIndex)
-      //
-      //  const departurePosition = this.departurePositions[flightIndex]
-      //    .clone()
-      //    .multiplyScalar(this.radius)
-      //
-      //  this.flightDummy.position.copy(departurePosition)
-      //  this.flightDummy.updateMatrix()
-      //  this.flightsInstance.setMatrixAt(flightIndex, this.flightDummy.matrix)
-      //  this.flightsInstance.instanceMatrix.needsUpdate = true
-      //},
+      onComplete: () => this.handleFlightOpacity(flightIndex, 0),
+    })
+  }
+
+  handleFlightOpacity(flightIndex, opacityTo) {
+    gsap.to(this.flightsInstance.geometry.attributes.aOpacity.array, {
+      [flightIndex]: opacityTo,
+      duration: 1,
+      ease: "power4.inOut",
+      onUpdate: () => {
+        this.flightsInstance.geometry.attributes.aOpacity.needsUpdate = true
+      },
     })
   }
 }
