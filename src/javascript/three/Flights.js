@@ -1,4 +1,6 @@
-import * as THREE from "three"
+import * as THREE from "three/webgpu"
+import { vec4, attribute } from "three/webgpu"
+
 import { gsap } from "gsap"
 import { flightsArray } from "../data"
 import { scene, timeModule } from "./Experience"
@@ -45,16 +47,20 @@ export class Flights {
   setFlights() {
     const flightsCount = flightsArray.length
 
-    this.flightGeometry = new THREE.SphereGeometry(0.005, 4, 4)
-    this.flightMaterial = new THREE.ShaderMaterial({
-      vertexShader: flightVertexShader,
-      fragmentShader: flightFragmentShader,
-      uniforms: {
-        uOpacity: { value: new Float32Array(flightsCount) },
-      },
+    //Geometry
+    this.flightGeometry = new THREE.SphereGeometry(0.005, 8, 8)
+
+    //Material
+    this.flightMaterial = new THREE.MeshStandardNodeMaterial({
       transparent: true,
     })
+    //It's that easy?!?!
+    this.flightMaterial.outputNode = vec4(
+      attribute("aInstanceColor"),
+      attribute("aOpacity"),
+    )
 
+    //Instance
     this.flightsInstance = new THREE.InstancedMesh(
       this.flightGeometry,
       this.flightMaterial,
@@ -109,8 +115,6 @@ export class Flights {
 
       this.flightProgresses[i] = 0
       this.durations[i] = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
-
-      this.flightMaterial.uniforms.uOpacity.value[i] = 0
 
       this.flightTempColor.set(Math.random(), 0, 0) //random red tint
       this.flightColors[i * 3 + 0] = this.flightTempColor.r

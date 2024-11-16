@@ -55,7 +55,7 @@ const tick = () => {
   camera.controls.update()
 
   // Render
-  renderer.renderer.render(scene, camera.camera)
+  renderer.renderer.renderAsync(scene, camera.camera)
 
   //Update time and timeModule
   timeModule.update(elapsedTime)
