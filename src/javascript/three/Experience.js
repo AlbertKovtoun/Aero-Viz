@@ -40,16 +40,13 @@ export const timeModule = new TimeModule()
 
 //Animate
 const clock = new THREE.Clock()
-let time = Date.now()
 
 const tick = () => {
   stats.begin()
 
   const elapsedTime = clock.getElapsedTime()
 
-  const currentTime = Date.now()
-  const deltaTime = currentTime - time
-  time = currentTime
+  const deltaTime = clock.getDelta()
 
   // Update controls
   camera.controls.update()
@@ -60,9 +57,9 @@ const tick = () => {
   //Update time and timeModule
   timeModule.update(elapsedTime)
 
-  //setTimeout(() => {
-  window.requestAnimationFrame(tick)
-  //}, 1000 / 30)
+  setTimeout(() => {
+    window.requestAnimationFrame(tick)
+  }, 1000 / 30)
 
   stats.end()
 }
