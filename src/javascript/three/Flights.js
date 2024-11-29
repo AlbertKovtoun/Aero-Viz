@@ -48,7 +48,7 @@ export class Flights {
     const flightsCount = flightsArray.length
 
     //Geometry
-    this.flightGeometry = new THREE.SphereGeometry(0.005, 8, 8)
+    this.flightGeometry = new THREE.SphereGeometry(0.001, 8, 8)
 
     //Material
     this.flightMaterial = new THREE.MeshStandardNodeMaterial({
@@ -116,7 +116,8 @@ export class Flights {
       this.flightProgresses[i] = 0
       this.durations[i] = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
 
-      this.flightTempColor.set(Math.random(), 0, 0) //random red tint
+      const randomTint = Math.random()
+      this.flightTempColor.set(randomTint, randomTint, randomTint) //random tint
       this.flightColors[i * 3 + 0] = this.flightTempColor.r
       this.flightColors[i * 3 + 1] = this.flightTempColor.g
       this.flightColors[i * 3 + 2] = this.flightTempColor.b
