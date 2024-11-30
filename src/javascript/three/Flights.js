@@ -1,12 +1,9 @@
 import * as THREE from "three/webgpu"
-import { vec4, attribute } from "three/webgpu"
+import { vec3, attribute } from "three/webgpu"
 
 import { gsap } from "gsap"
 import { flightsArray } from "../data"
 import { scene, timeModule } from "./Experience"
-
-import flightVertexShader from "../../shaders/flight/vertex.glsl?raw"
-import flightFragmentShader from "../../shaders/flight/fragment.glsl?raw"
 
 export class Flights {
   constructor() {
@@ -48,17 +45,15 @@ export class Flights {
     const flightsCount = flightsArray.length
 
     //Geometry
-    this.flightGeometry = new THREE.SphereGeometry(0.001, 8, 8)
+    this.flightGeometry = new THREE.SphereGeometry(0.01, 12, 12)
 
     //Material
     this.flightMaterial = new THREE.MeshStandardNodeMaterial({
       transparent: true,
     })
-    //It's that easy?!?!
-    this.flightMaterial.outputNode = vec4(
-      attribute("aInstanceColor"),
-      attribute("aOpacity"),
-    )
+    //this.flightMaterial.colorNode = attribute("aInstanceColor")
+    this.flightMaterial.colorNode = vec3(1.0)
+    this.flightMaterial.opacityNode = attribute("aOpacity")
 
     //Instance
     this.flightsInstance = new THREE.InstancedMesh(

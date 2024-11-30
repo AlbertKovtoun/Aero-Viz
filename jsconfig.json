@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "module": "ESNext",
+    "paths": {
+      "three/webgpu": ["./node_modules/three"],
+      "three/*": ["./node_modules/three/*"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

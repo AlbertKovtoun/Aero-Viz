@@ -31,7 +31,8 @@ export class Earth {
       1,
       texture(this.earthRoughnessTexture, uv()),
     )
-    this.earthMaterial.lightingModelNode = THREE.physicalLightingModel
+    // Not sure if this is needed
+    //this.earthMaterial.lightingModelNode = THREE.physicalLightingModel
 
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 32, 32),

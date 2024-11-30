@@ -32,6 +32,7 @@ export class TimeModule {
     if (this.globalTimeProgress < 1) {
       this.globalTimeProgress = elapsedTime * 0.01
     }
+
     this.convertProgressToTime(this.globalTimeProgress)
   }
 }
