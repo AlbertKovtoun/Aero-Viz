@@ -11,6 +11,7 @@ import {
   normalWorld,
   smoothstep,
 } from "three/webgpu"
+import { MathUtils } from "three"
 import { loaders, renderer, scene } from "./Experience"
 
 export class Earth {
@@ -61,7 +62,8 @@ export class Earth {
     const color2 = texture(this.earthNightColorTexture, uv())
     const mixFactor = smoothstep(-0.04, 0.04, normalWorld.x)
 
-    this.earthMaterial.colorNode = mix(color1, color2, mixFactor)
+    //this.earthMaterial.colorNode = mix(color1, color2, mixFactor)
+    this.earthMaterial.colorNode = color1
 
     // Roughness
     this.earthMaterial.roughnessNode = sub(
@@ -76,6 +78,7 @@ export class Earth {
       new THREE.SphereGeometry(1, 32, 32),
       this.earthMaterial,
     )
+    this.earth.rotateZ(MathUtils.degToRad(23.5))
 
     scene.add(this.earth)
   }
@@ -98,6 +101,6 @@ export class Earth {
       new THREE.SphereGeometry(1.02, 32, 32),
       this.cloudsMaterial,
     )
-    scene.add(this.clouds)
+    //scene.add(this.clouds)
   }
 }
