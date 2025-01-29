@@ -5,7 +5,6 @@ import { Camera } from "./Camera"
 import { Renderer } from "./Renderer"
 import { Sizes } from "./Sizes"
 import { Loaders } from "./Loaders"
-
 import { PostProcessing } from "./PostProcessing"
 import { Earth } from "./Earth"
 import { Flights } from "./Flights"
@@ -38,28 +37,32 @@ export const postProcessing = new PostProcessing()
 
 export const timeModule = new TimeModule()
 
-//Animate
 const clock = new THREE.Clock()
+let lastTime = performance.now()
 
 const tick = () => {
   stats.begin()
 
   const elapsedTime = clock.getElapsedTime()
 
-  const deltaTime = clock.getDelta()
+  const currentTime = performance.now()
+  const deltaTime = currentTime - lastTime
+  lastTime = currentTime
 
-  // Update controls
   camera.controls.update()
 
-  // Render
-  renderer.renderer.renderAsync(scene, camera.camera)
-
-  //Update time and timeModule
   timeModule.update(elapsedTime)
 
-  setTimeout(() => {
-    window.requestAnimationFrame(tick)
-  }, 1000 / 30)
+  if (flights.flightsInstance) {
+    flights.update(deltaTime)
+    earth.update(deltaTime)
+  }
+
+  renderer.renderer.renderAsync(scene, camera.camera)
+
+  //setTimeout(() => {
+  window.requestAnimationFrame(tick)
+  //}, 1000 / 30)
 
   stats.end()
 }

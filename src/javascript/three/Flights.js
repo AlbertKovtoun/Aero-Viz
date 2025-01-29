@@ -1,6 +1,8 @@
 import * as THREE from "three/webgpu"
 import { vec3, attribute } from "three/webgpu"
 
+import { MathUtils } from "three"
+
 import { gsap } from "gsap"
 import { flightsArray } from "../data"
 import { scene, timeModule } from "./Experience"
@@ -61,6 +63,8 @@ export class Flights {
       this.flightMaterial,
       flightsCount,
     )
+    //Earth tilt
+    this.flightsInstance.rotateZ(MathUtils.degToRad(23.5))
 
     this.departurePositions = []
     this.normalizedDepartureTimes = new Float32Array(flightsCount)
@@ -195,5 +199,9 @@ export class Flights {
         this.flightsInstance.geometry.attributes.aOpacity.needsUpdate = true
       },
     })
+  }
+
+  update(deltaTime) {
+    this.flightsInstance.rotateY(deltaTime * 0.0001)
   }
 }

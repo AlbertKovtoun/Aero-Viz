@@ -78,8 +78,8 @@ export class Earth {
       new THREE.SphereGeometry(1, 32, 32),
       this.earthMaterial,
     )
+    //Earth tilt
     this.earth.rotateZ(MathUtils.degToRad(23.5))
-
     scene.add(this.earth)
   }
 
@@ -102,5 +102,9 @@ export class Earth {
       this.cloudsMaterial,
     )
     //scene.add(this.clouds)
+  }
+
+  update(deltaTime) {
+    this.earth.rotateY(deltaTime * 0.0001)
   }
 }
