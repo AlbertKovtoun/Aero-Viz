@@ -1,11 +1,12 @@
-import * as THREE from "three/webgpu"
-import { vec3, attribute } from "three/webgpu"
-
+import * as THREE from "three"
 import { MathUtils } from "three"
 
 import { gsap } from "gsap"
 import { flightsArray } from "../data"
 import { scene, timeModule } from "./Experience"
+
+import flightVertexShader from "../../shaders/flight/vertex.glsl?raw"
+import flightFragmentShader from "../../shaders/flight/fragment.glsl?raw"
 
 export class Flights {
   constructor() {
@@ -50,12 +51,11 @@ export class Flights {
     this.flightGeometry = new THREE.SphereGeometry(0.001, 12, 12)
 
     //Material
-    this.flightMaterial = new THREE.MeshBasicNodeMaterial({
+    this.flightMaterial = new THREE.ShaderMaterial({
+      vertexShader: flightVertexShader,
+      fragmentShader: flightFragmentShader,
       transparent: true,
     })
-    //this.flightMaterial.colorNode = attribute("aInstanceColor")
-    this.flightMaterial.colorNode = vec3(1.0)
-    this.flightMaterial.opacityNode = attribute("aOpacity")
 
     //Instance
     this.flightsInstance = new THREE.InstancedMesh(

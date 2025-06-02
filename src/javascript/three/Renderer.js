@@ -1,4 +1,4 @@
-import * as THREE from "three/webgpu"
+import * as THREE from "three"
 import { canvas, sizes } from "./Experience"
 
 export class Renderer {
@@ -7,7 +7,7 @@ export class Renderer {
   }
 
   setRenderer() {
-    this.renderer = new THREE.WebGPURenderer({
+    this.renderer = new THREE.WebGLRenderer({
       canvas: canvas,
       antialias: true,
     })
