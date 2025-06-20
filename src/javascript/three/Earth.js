@@ -10,7 +10,7 @@ import {
   color,
   normalWorld,
   smoothstep,
-} from "three/webgpu"
+} from "three/tsl"
 import { MathUtils } from "three"
 import { loaders, renderer, scene } from "./Experience"
 

@@ -1,5 +1,5 @@
 import * as THREE from "three/webgpu"
-import { vec3, attribute } from "three/webgpu"
+import { vec3, attribute } from "three/tsl"
 
 import { MathUtils } from "three"
 
