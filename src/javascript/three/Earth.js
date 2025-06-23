@@ -10,8 +10,8 @@ import {
   color,
   normalWorld,
   smoothstep,
+  dot,
 } from "three/tsl"
-import { MathUtils } from "three"
 import { loaders, renderer, scene } from "./Experience"
 
 export class Earth {
@@ -19,13 +19,6 @@ export class Earth {
     this.setTextures()
     this.setEarth()
     this.setClouds()
-
-    //const directionalLight = new THREE.DirectionalLight("#ffffe6", 2)
-    //directionalLight.position.set(1, 0, 0)
-    //scene.add(directionalLight)
-
-    //const ambientLight = new THREE.AmbientLight("#ffffff", 2)
-    //scene.add(ambientLight)
   }
 
   setTextures() {
@@ -33,11 +26,13 @@ export class Earth {
       "/textures/earth-day-color.jpg",
     )
     this.earthDayColorTexture.colorSpace = THREE.SRGBColorSpace
+    this.earthDayColorTexture.anisotropy = 8
 
     this.earthNightColorTexture = loaders.textureLoader.load(
       "/textures/earth-night-color.jpg",
     )
     this.earthNightColorTexture.colorSpace = THREE.SRGBColorSpace
+    this.earthNightColorTexture.anisotropy = 8
 
     this.earthRoughnessTexture = loaders.textureLoader.load(
       "/textures/earth-roughness.jpg",
@@ -48,22 +43,25 @@ export class Earth {
       "/textures/earth-clouds.jpg",
     )
     this.cloudsTexture.colorSpace = THREE.SRGBColorSpace
-    //Add this to make texture not as blurry when viewing from an angle
-    //this.cloudsTexture.anisotropy =
-    //  renderer.renderer.capabilities.getMaxAnisotropy()
   }
 
-  setEarth() {
+  setEarthMaterial() {
     this.earthMaterial = new THREE.MeshBasicNodeMaterial()
 
     // Color
-    //this.earthMaterial.colorNode = texture(this.earthColorTexture, uv())
-    const color1 = texture(this.earthDayColorTexture, uv())
-    const color2 = texture(this.earthNightColorTexture, uv())
-    const mixFactor = smoothstep(-0.04, 0.04, normalWorld.x)
+    const dayColor = texture(this.earthDayColorTexture, uv())
+    const nightColor = texture(this.earthNightColorTexture, uv())
 
-    //this.earthMaterial.colorNode = mix(color1, color2, mixFactor)
-    this.earthMaterial.colorNode = color1
+    //Lighting
+    let lighting = vec3(0.0)
+    const sunDirection = vec3(-1.0, 0.2, 0.0)
+    const sunLight = dot(sunDirection, normalWorld)
+
+    lighting = sunLight.mul(1.0)
+
+    const finalColor = vec3(dayColor).mul(lighting)
+
+    this.earthMaterial.colorNode = finalColor
 
     // Roughness
     this.earthMaterial.roughnessNode = sub(
@@ -74,12 +72,14 @@ export class Earth {
     // Not sure if this is needed
     //this.earthMaterial.lightingModelNode = THREE.physicalLightingModel
 
+    return this.earthMaterial
+  }
+
+  setEarth() {
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 32, 32),
-      this.earthMaterial,
+      this.setEarthMaterial(),
     )
-    //Earth tilt
-    this.earth.rotateZ(MathUtils.degToRad(23.5))
     scene.add(this.earth)
   }
 
