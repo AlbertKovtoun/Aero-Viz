@@ -45,14 +45,14 @@ export class Flights {
     const flightsCount = flightsArray.length
 
     //Geometry
-    this.flightGeometry = new THREE.SphereGeometry(0.001, 12, 12)
+    this.flightGeometry = new THREE.SphereGeometry(0.002, 12, 12)
 
     //Material
     this.flightMaterial = new THREE.MeshBasicNodeMaterial({
       transparent: true,
     })
     //this.flightMaterial.colorNode = attribute("aInstanceColor")
-    this.flightMaterial.colorNode = vec3(1.0)
+    this.flightMaterial.colorNode = vec3(1.0, 0.0, 0.0)
     this.flightMaterial.opacityNode = attribute("aOpacity")
 
     //Instance

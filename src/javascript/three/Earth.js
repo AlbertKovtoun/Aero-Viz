@@ -11,6 +11,8 @@ import {
   normalWorld,
   smoothstep,
   dot,
+  oneMinus,
+  pow,
 } from "three/tsl"
 import { loaders, renderer, scene } from "./Experience"
 
@@ -23,13 +25,13 @@ export class Earth {
 
   setTextures() {
     this.earthDayColorTexture = loaders.textureLoader.load(
-      "/textures/earth-day-color.jpg",
+      "/textures/earth-day-color-2.jpg",
     )
     this.earthDayColorTexture.colorSpace = THREE.SRGBColorSpace
     this.earthDayColorTexture.anisotropy = 8
 
     this.earthNightColorTexture = loaders.textureLoader.load(
-      "/textures/earth-night-color.jpg",
+      "/textures/earth-night-color-2.jpg",
     )
     this.earthNightColorTexture.colorSpace = THREE.SRGBColorSpace
     this.earthNightColorTexture.anisotropy = 8
@@ -43,6 +45,7 @@ export class Earth {
       "/textures/earth-clouds.jpg",
     )
     this.cloudsTexture.colorSpace = THREE.SRGBColorSpace
+    this.cloudsTexture.anisotropy = 8
   }
 
   setEarthMaterial() {
@@ -53,13 +56,13 @@ export class Earth {
     const nightColor = texture(this.earthNightColorTexture, uv())
 
     //Lighting
-    let lighting = vec3(0.0)
-    const sunDirection = vec3(-1.0, 0.2, 0.0)
+    const sunDirection = vec3(1.0, 0.2, 0.0)
     const sunLight = dot(sunDirection, normalWorld)
 
-    lighting = sunLight.mul(1.0)
+    const color = mix(nightColor, dayColor, smoothstep(-0.2, 0.5, sunLight))
 
-    const finalColor = vec3(dayColor).mul(lighting)
+    const finalColor = vec3(color)
+    // const finalColor = smoothstep(0.0, 0.05, sunLight)
 
     this.earthMaterial.colorNode = finalColor
 
@@ -77,7 +80,7 @@ export class Earth {
 
   setEarth() {
     this.earth = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 32, 32),
+      new THREE.SphereGeometry(1, 64, 64),
       this.setEarthMaterial(),
     )
     scene.add(this.earth)
@@ -88,23 +91,22 @@ export class Earth {
 
     this.cloudsMaterial.colorNode = color(vec3(1))
 
-    const mixFactor = smoothstep(-0.04, 0.04, normalWorld.x)
+    const sunDirection = vec3(1.0, 0.2, 0.0)
+    const sunLight = dot(sunDirection, normalWorld)
 
-    //this.cloudsMaterial.opacityNode = texture(this.cloudsTexture, uv()).mul(1)
-    this.cloudsMaterial.opacityNode = mix(
-      texture(this.cloudsTexture, uv()),
-      vec3(0.0),
-      mixFactor,
+    this.cloudsMaterial.opacityNode = texture(this.cloudsTexture, uv()).mul(
+      smoothstep(-0.4, 0.5, sunLight),
     )
 
     this.clouds = new THREE.Mesh(
-      new THREE.SphereGeometry(1.02, 32, 32),
+      new THREE.SphereGeometry(1.01, 64, 64),
       this.cloudsMaterial,
     )
-    //scene.add(this.clouds)
+    scene.add(this.clouds)
   }
 
   update(deltaTime) {
-    this.earth.rotateY(deltaTime * 0.0001)
+    // this.earth.rotateY(deltaTime * 0.0001)
+    // this.clouds.rotateY(deltaTime * 0.0001)
   }
 }
