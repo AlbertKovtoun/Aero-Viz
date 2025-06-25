@@ -52,7 +52,7 @@ export class Flights {
       transparent: true,
     })
     //this.flightMaterial.colorNode = attribute("aInstanceColor")
-    this.flightMaterial.colorNode = vec3(1.0, 0.0, 0.0)
+    this.flightMaterial.colorNode = vec3(1.0)
     this.flightMaterial.opacityNode = attribute("aOpacity")
 
     //Instance
@@ -198,6 +198,6 @@ export class Flights {
   }
 
   update(deltaTime) {
-    // this.flightsInstance.rotateY(deltaTime * 0.0001)
+    this.flightsInstance.rotateY(deltaTime * 0.0001)
   }
 }
