@@ -13,6 +13,12 @@ import {
   dot,
   oneMinus,
   pow,
+  normalize,
+  reflect,
+  max,
+  cameraPosition,
+  positionWorld,
+  add,
 } from "three/tsl"
 import { loaders, renderer, scene } from "./Experience"
 
@@ -51,29 +57,35 @@ export class Earth {
   setEarthMaterial() {
     this.earthMaterial = new THREE.MeshBasicNodeMaterial()
 
+    const viewDirection = normalize(cameraPosition.sub(positionWorld))
+
     // Color
     const dayColor = texture(this.earthDayColorTexture, uv())
     const nightColor = texture(this.earthNightColorTexture, uv())
 
-    //Lighting
-    const sunDirection = vec3(1.0, 0.2, 0.0)
+    // Roughness
+    const roughness = texture(this.earthRoughnessTexture, uv())
+
+    // Lighting
+    const sunDirection = normalize(vec3(1.0, 0.2, 0.0))
     const sunLight = dot(sunDirection, normalWorld)
 
-    const color = mix(nightColor, dayColor, smoothstep(-0.2, 0.5, sunLight))
+    // Mix day and night textures based on sunlight
+    let color = mix(nightColor, dayColor, smoothstep(-0.2, 0.5, sunLight))
 
-    const finalColor = vec3(color)
-    // const finalColor = smoothstep(0.0, 0.05, sunLight)
+    // Specular Highlight
+    const reflectedLight = normalize(
+      reflect(sunDirection.negate(), normalWorld),
+    )
+    let phongValue = max(0.0, dot(viewDirection, reflectedLight))
+    phongValue = pow(phongValue, 128.0)
+
+    const specularColor = vec3(1.0, 1.0, 1.0)
+    const specular = specularColor.mul(phongValue.mul(roughness))
+
+    const finalColor = color.rgb.add(specular)
 
     this.earthMaterial.colorNode = finalColor
-
-    // Roughness
-    this.earthMaterial.roughnessNode = sub(
-      1,
-      texture(this.earthRoughnessTexture, uv()),
-    )
-
-    // Not sure if this is needed
-    //this.earthMaterial.lightingModelNode = THREE.physicalLightingModel
 
     return this.earthMaterial
   }
@@ -102,7 +114,7 @@ export class Earth {
       new THREE.SphereGeometry(1.01, 64, 64),
       this.cloudsMaterial,
     )
-    scene.add(this.clouds)
+    // scene.add(this.clouds)
   }
 
   update(deltaTime) {
