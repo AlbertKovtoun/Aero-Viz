@@ -2,7 +2,6 @@ import * as THREE from "three/webgpu"
 import {
   vec4,
   vec3,
-  sub,
   texture,
   uv,
   mul,
@@ -19,9 +18,12 @@ import {
   cameraPosition,
   positionWorld,
   add,
-  min,
   abs,
+  sub,
   normalMap,
+  mat3,
+  tangentWorld,
+  bitangentWorld,
 } from "three/tsl"
 import { loaders, renderer, scene } from "./Experience"
 
@@ -78,24 +80,30 @@ export class Earth {
     const roughnessMap = texture(this.earthRoughnessTexture, uv())
 
     // Normal
-    const normalTexture = texture(this.earthNormalTexture, uv())
+    const normalTexture = texture(this.earthNormalTexture, uv()).rgb
+
+    const tangentSpaceNormal = normalize(normalTexture)
+
+    const TBN = mat3(tangentWorld, bitangentWorld, normalWorld)
+
+    const finalNormal = normalize(TBN.mul(tangentSpaceNormal))
 
     // Lighting
     const sunDirection = normalize(vec3(1.0, 0.2, 0.0))
-    const sunLight = dot(sunDirection, normalWorld)
+    const sunLight = dot(sunDirection, finalNormal)
 
     // Mix day and night textures based on sunlight
     let color = mix(nightColor, dayColor, smoothstep(-0.2, 0.5, sunLight))
 
     // Specular Highlight
     const reflectedLight = normalize(
-      reflect(sunDirection.negate(), normalWorld),
+      reflect(sunDirection.negate(), finalNormal),
     )
     let phongValue = max(0.0, dot(viewDirection, reflectedLight))
     phongValue = pow(phongValue, 128.0)
 
     //Fresnel
-    let fresnel = oneMinus(max(0.0, dot(viewDirection, normalWorld)))
+    let fresnel = oneMinus(max(0.0, dot(viewDirection, finalNormal)))
     fresnel = pow(fresnel, 2.0)
 
     const atmosphereColor = vec3(0.4, 0.7, 1.0)
@@ -109,10 +117,10 @@ export class Earth {
     fresnel = fresnel.mul(dynamicGlowColor).mul(nightOcclusion)
 
     let specularColor = mix(vec3(1.0), dynamicGlowColor, fresnel.mul(2))
-    let specular = specularColor.mul(phongValue.mul(roughnessMap))
+    let specular = specularColor.mul(phongValue.mul(roughnessMap.add(0.05)))
 
     const finalColor = color.rgb.add(specular).add(fresnel)
-    // const finalColor = vec3(normalTexture)
+    // const finalColor = vec3(finalNormal)
 
     this.earthMaterial.colorNode = finalColor
 
@@ -182,11 +190,11 @@ export class Earth {
       new THREE.SphereGeometry(1.001, 64, 64),
       this.cloudsMaterial,
     )
-    // scene.add(this.clouds)
+    scene.add(this.clouds)
   }
 
   update(deltaTime) {
-    // this.earth.rotateY(deltaTime * 0.0001)
-    // this.clouds.rotateY(deltaTime * 0.0001)
+    this.earth.rotateY(deltaTime * 0.0001)
+    this.clouds.rotateY(deltaTime * 0.0001)
   }
 }
