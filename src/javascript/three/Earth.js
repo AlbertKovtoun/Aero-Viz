@@ -21,6 +21,7 @@ import {
   add,
   min,
   abs,
+  normalMap,
 } from "three/tsl"
 import { loaders, renderer, scene } from "./Experience"
 
@@ -34,13 +35,13 @@ export class Earth {
 
   setTextures() {
     this.earthDayColorTexture = loaders.textureLoader.load(
-      "/textures/earth-day-color-2.jpg",
+      "/textures/earth-day-color.jpg",
     )
     this.earthDayColorTexture.colorSpace = THREE.SRGBColorSpace
     this.earthDayColorTexture.anisotropy = 8
 
     this.earthNightColorTexture = loaders.textureLoader.load(
-      "/textures/earth-night-color-2.jpg",
+      "/textures/earth-night-color.jpg",
     )
     this.earthNightColorTexture.colorSpace = THREE.SRGBColorSpace
     this.earthNightColorTexture.anisotropy = 8
@@ -50,6 +51,12 @@ export class Earth {
     )
     this.earthRoughnessTexture.colorSpace = THREE.SRGBColorSpace
     this.earthRoughnessTexture.anisotropy = 8
+
+    this.earthNormalTexture = loaders.textureLoader.load(
+      "/textures/earth-normal.jpg",
+    )
+    this.earthNormalTexture.colorSpace = THREE.SRGBColorSpace
+    this.earthNormalTexture.anisotropy = 8
 
     this.cloudsTexture = loaders.textureLoader.load(
       "/textures/earth-clouds.jpg",
@@ -68,7 +75,10 @@ export class Earth {
     const nightColor = texture(this.earthNightColorTexture, uv())
 
     // Roughness
-    const roughness = texture(this.earthRoughnessTexture, uv())
+    const roughnessMap = texture(this.earthRoughnessTexture, uv())
+
+    // Normal
+    const normalTexture = texture(this.earthNormalTexture, uv())
 
     // Lighting
     const sunDirection = normalize(vec3(1.0, 0.2, 0.0))
@@ -99,10 +109,10 @@ export class Earth {
     fresnel = fresnel.mul(dynamicGlowColor).mul(nightOcclusion)
 
     let specularColor = mix(vec3(1.0), dynamicGlowColor, fresnel.mul(2))
-    let specular = specularColor.mul(phongValue.mul(roughness))
+    let specular = specularColor.mul(phongValue.mul(roughnessMap))
 
     const finalColor = color.rgb.add(specular).add(fresnel)
-    // const finalColor = vec3(specularColor)
+    // const finalColor = vec3(normalTexture)
 
     this.earthMaterial.colorNode = finalColor
 
