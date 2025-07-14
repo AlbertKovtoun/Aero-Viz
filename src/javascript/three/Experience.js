@@ -10,6 +10,8 @@ import { Earth } from "./Earth"
 import { Flights } from "./Flights"
 import { Pane } from "tweakpane"
 import { TimeModule } from "./TimeModule"
+import { Sun } from "./Sun"
+import { Environment } from "./Environment"
 
 const pane = new Pane()
 
@@ -26,6 +28,10 @@ export const loaders = new Loaders()
 export const flights = new Flights()
 
 export const earth = new Earth()
+
+export const sun = new Sun()
+
+export const environment = new Environment()
 
 export const sizes = new Sizes()
 
