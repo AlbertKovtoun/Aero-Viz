@@ -1,33 +1,21 @@
-import * as THREE from "three"
+import * as THREE from "three/webgpu"
 
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer"
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass"
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass"
-import { GammaCorrectionShader } from "three/examples/jsm/shaders/GammaCorrectionShader"
+import { pass, mrt, output, emissive } from "three/tsl"
+import { bloom } from "three/addons/tsl/display/BloomNode.js"
 
-import { camera, renderer, scene, sizes } from "./Experience"
+import { camera, renderer, scene } from "./Experience"
 
 export class PostProcessing {
   constructor() {
-    this.renderTarget = new THREE.WebGLRenderTarget(800, 600, { samples: 5 })
+    this.scenePass = pass(scene, camera.camera)
+    this.scenePass.setMRT(mrt({ output, emissive }))
 
-    this.effectComposer = new EffectComposer(
-      renderer.renderer,
-      this.renderTarget,
-    )
+    this.outputPass = this.scenePass.getTextureNode()
+    this.emissivePass = this.scenePass.getTextureNode("emissive")
 
-    this.effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    this.effectComposer.setSize(sizes.width, sizes.height)
+    this.bloomPass = bloom(this.emissivePass, 0.8, 1)
 
-    this.renderPass = new RenderPass(scene, camera.camera)
-    this.effectComposer.addPass(this.renderPass)
-
-    // this.gammaCorrectionPass = new ShaderPass(GammaCorrectionShader)
-    // this.effectComposer.addPass(this.gammaCorrectionPass)
-
-    window.addEventListener("resize", () => {
-      this.effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-      this.effectComposer.setSize(sizes.width, sizes.height)
-    })
+    this.postProcessing = new THREE.PostProcessing(renderer.renderer)
+    this.postProcessing.outputNode = this.outputPass.add(this.bloomPass)
   }
 }

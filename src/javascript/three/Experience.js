@@ -64,7 +64,8 @@ const tick = () => {
     earth.update(deltaTime)
   }
 
-  renderer.renderer.renderAsync(scene, camera.camera)
+  // renderer.renderer.renderAsync(scene, camera.camera)
+  postProcessing.postProcessing.renderAsync()
 
   //setTimeout(() => {
   window.requestAnimationFrame(tick)

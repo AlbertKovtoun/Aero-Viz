@@ -1,5 +1,5 @@
 import * as THREE from "three/webgpu"
-import { vec3, attribute } from "three/tsl"
+import { vec3, attribute, color, mul } from "three/tsl"
 
 import { gsap } from "gsap"
 import { flightsArray } from "../data"
@@ -50,10 +50,14 @@ export class Flights {
     //Material
     this.flightMaterial = new THREE.MeshBasicNodeMaterial({
       transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
     })
     //this.flightMaterial.colorNode = attribute("aInstanceColor")
     this.flightMaterial.colorNode = vec3(1.0)
     this.flightMaterial.opacityNode = attribute("aOpacity")
+
+    this.flightMaterial.emissiveNode = color(0xffffff)
 
     //Instance
     this.flightsInstance = new THREE.InstancedMesh(

@@ -93,7 +93,7 @@ export class Earth {
     const sunLight = dot(sunDirection, finalNormal)
 
     // Mix day and night textures based on sunlight
-    let color = mix(nightColor, dayColor, smoothstep(-0.2, 0.5, sunLight))
+    let diffuse = mix(nightColor, dayColor, smoothstep(-0.2, 0.5, sunLight))
 
     // Specular Highlight
     const reflectedLight = normalize(
@@ -119,10 +119,16 @@ export class Earth {
     let specularColor = mix(vec3(1.0), dynamicGlowColor, fresnel.mul(2))
     let specular = specularColor.mul(phongValue.mul(roughnessMap.add(0.05)))
 
-    const finalColor = color.rgb.add(specular).add(fresnel)
+    const finalColor = diffuse.rgb.add(specular).add(fresnel)
     // const finalColor = vec3(finalNormal)
 
     this.earthMaterial.colorNode = finalColor
+
+    this.earthMaterial.emissiveNode = smoothstep(
+      0.5,
+      1.0,
+      nightColor.mul(oneMinus(nightOcclusion)),
+    )
 
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),
