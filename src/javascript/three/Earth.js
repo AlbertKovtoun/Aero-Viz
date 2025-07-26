@@ -1,7 +1,10 @@
 import * as THREE from "three/webgpu"
 import {
+  fract,
+  uniform,
   vec4,
   vec3,
+  vec2,
   texture,
   uv,
   mul,
@@ -17,6 +20,7 @@ import {
   max,
   cameraPosition,
   positionWorld,
+  positionLocal,
   add,
   abs,
   sub,
@@ -65,6 +69,10 @@ export class Earth {
     )
     this.cloudsTexture.colorSpace = THREE.SRGBColorSpace
     this.cloudsTexture.anisotropy = 8
+
+    this.simplexNoiseTexture = loaders.textureLoader.load(
+      "/textures/simplex-noise.jpg",
+    )
   }
 
   setEarth() {
@@ -183,6 +191,21 @@ export class Earth {
   setClouds() {
     this.cloudsMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true })
 
+    this.cloudsMaterialTime = uniform(0)
+
+    const animatedUV = uv().add(vec2(this.cloudsMaterialTime.mul(0.2), 0))
+    const simplexNoiseTexture = texture(this.simplexNoiseTexture, animatedUV)
+
+    const displacement = vec3(simplexNoiseTexture.rgb).mul(0.05)
+
+    const normal = normalWorld
+    const tangentialDisplacement = displacement.sub(
+      normal.mul(dot(displacement, normal)),
+    )
+
+    const displacedPosition = positionWorld.add(tangentialDisplacement)
+    this.cloudsMaterial.positionNode = displacedPosition.normalize().mul(1.002)
+
     this.cloudsMaterial.colorNode = color(vec3(1))
 
     const sunDirection = vec3(1.0, 0.2, 0.0)
@@ -193,14 +216,16 @@ export class Earth {
     )
 
     this.clouds = new THREE.Mesh(
-      new THREE.SphereGeometry(1.001, 64, 64),
+      new THREE.SphereGeometry(1.005, 64, 64),
       this.cloudsMaterial,
     )
     scene.add(this.clouds)
   }
 
-  update(deltaTime) {
-    this.earth.rotateY(deltaTime * 0.0001)
-    this.clouds.rotateY(deltaTime * 0.0001)
+  update(deltaTime, elapsedTime) {
+    // this.earth.rotateY(deltaTime * 0.0001)
+    // this.clouds.rotateY(deltaTime * 0.0001)
+
+    this.cloudsMaterialTime.value = elapsedTime
   }
 }

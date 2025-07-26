@@ -202,6 +202,6 @@ export class Flights {
   }
 
   update(deltaTime) {
-    this.flightsInstance.rotateY(deltaTime * 0.0001)
+    // this.flightsInstance.rotateY(deltaTime * 0.0001)
   }
 }

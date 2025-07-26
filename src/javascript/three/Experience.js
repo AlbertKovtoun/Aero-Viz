@@ -61,7 +61,7 @@ const tick = () => {
 
   if (flights.flightsInstance) {
     flights.update(deltaTime)
-    earth.update(deltaTime)
+    earth.update(deltaTime, elapsedTime)
   }
 
   // renderer.renderer.renderAsync(scene, camera.camera)
