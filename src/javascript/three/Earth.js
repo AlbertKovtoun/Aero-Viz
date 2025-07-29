@@ -1,5 +1,9 @@
 import * as THREE from "three/webgpu"
 import {
+  float,
+  length,
+  exp,
+  mod,
   fract,
   uniform,
   vec4,
@@ -73,6 +77,8 @@ export class Earth {
     this.simplexNoiseTexture = loaders.textureLoader.load(
       "/textures/simplex-noise.jpg",
     )
+    this.simplexNoiseTexture.wrapS = THREE.RepeatWrapping
+    this.simplexNoiseTexture.wrapT = THREE.RepeatWrapping
   }
 
   setEarth() {
@@ -138,6 +144,8 @@ export class Earth {
       nightColor.mul(oneMinus(nightOcclusion)),
     )
 
+    // this.earthMaterial.emissiveNode = fresnel.mul(4)
+
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),
       this.earthMaterial,
@@ -146,46 +154,54 @@ export class Earth {
   }
 
   setAtmosphere() {
+    // Atmosphere Material - Using same values as Earth shader
     this.atmosphereMaterial = new THREE.MeshBasicNodeMaterial({
-      transparent: true,
       side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
+      transparent: true,
     })
 
-    const viewDirection = normalize(cameraPosition.sub(positionWorld))
-
-    // Lighting
+    // Use the same sun direction as Earth shader
     const sunDirection = normalize(vec3(1.0, 0.2, 0.0))
-    const sunLight = dot(sunDirection, normalWorld)
 
-    //Fresnel
-    let fresnel = oneMinus(max(0.0, dot(viewDirection, normalWorld)))
-    fresnel = pow(fresnel, 2.0)
+    // Basic variables needed for atmosphere
+    const viewDirection = normalize(positionWorld.sub(cameraPosition))
+    const normal = normalize(normalWorld)
 
-    let fadeOut = fresnel
+    // Sun orientation (dot product with atmosphere normal)
+    const sunOrientation = dot(sunDirection, normal)
 
+    // Edge Alpha - atmosphere fades at edges
+    let edgeAlpha = dot(viewDirection, normal)
+    edgeAlpha = smoothstep(0.0, 0.8, edgeAlpha)
+
+    // Day Alpha - atmosphere fades on night side
+    const dayAlpha = smoothstep(-0.3, 0.0, sunOrientation)
+
+    // Combine both alphas
+    const alpha = edgeAlpha.mul(dayAlpha)
+
+    // Use EXACT same colors as Earth shader
     const atmosphereColor = vec3(0.4, 0.7, 1.0)
     const sunsetColor = vec3(1.0, 0.2, 0.2)
 
-    const terminatorFactor = oneMinus(smoothstep(0.0, 0.8, abs(sunLight)))
+    // Use EXACT same terminator calculation as Earth shader
+    const terminatorFactor = oneMinus(smoothstep(0.0, 0.8, abs(sunOrientation)))
+
+    // Use EXACT same color mixing as Earth shader
     const dynamicGlowColor = mix(atmosphereColor, sunsetColor, terminatorFactor)
 
-    const nightOcclusion = smoothstep(-0.1, 0.1, sunLight)
+    // Apply a bit more intensity since it's the atmosphere
+    const finalAtmosphereColor = dynamicGlowColor.mul(1.5)
 
-    fresnel = fresnel.mul(dynamicGlowColor).mul(nightOcclusion)
-
-    const finalColor = fresnel
-
-    this.atmosphereMaterial.colorNode = fresnel
-
-    this.atmosphereMaterial.opacityNode = nightOcclusion
+    // Set material properties
+    this.atmosphereMaterial.colorNode = finalAtmosphereColor
+    this.atmosphereMaterial.opacityNode = alpha
 
     this.atmosphere = new THREE.Mesh(
       new THREE.SphereGeometry(1.02, 64, 64),
       this.atmosphereMaterial,
     )
-    // scene.add(this.atmosphere)
+    scene.add(this.atmosphere)
   }
 
   setClouds() {
@@ -193,8 +209,15 @@ export class Earth {
 
     this.cloudsMaterialTime = uniform(0)
 
-    const animatedUV = uv().add(vec2(this.cloudsMaterialTime.mul(0.2), 0))
-    const simplexNoiseTexture = texture(this.simplexNoiseTexture, animatedUV)
+    const cloudMovementSpeed = 0.004
+
+    this.animatedUV = uv().add(
+      vec2(this.cloudsMaterialTime.mul(cloudMovementSpeed), 0),
+    )
+    const simplexNoiseTexture = texture(
+      this.simplexNoiseTexture,
+      this.animatedUV,
+    )
 
     const displacement = vec3(simplexNoiseTexture.rgb).mul(0.05)
 
