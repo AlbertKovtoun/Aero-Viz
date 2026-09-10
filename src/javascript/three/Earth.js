@@ -121,7 +121,8 @@ export class Earth {
     fresnel = pow(fresnel, 2.0)
 
     const atmosphereColor = vec3(0.4, 0.7, 1.0)
-    const sunsetColor = vec3(1.0, 0.2, 0.2)
+    // const sunsetColor = vec3(1.0, 0.2, 0.2)
+    const sunsetColor = color("#f09d4a")
 
     const terminatorFactor = oneMinus(smoothstep(0.0, 0.8, abs(sunLight)))
     const dynamicGlowColor = mix(atmosphereColor, sunsetColor, terminatorFactor)
@@ -154,46 +155,34 @@ export class Earth {
   }
 
   setAtmosphere() {
-    // Atmosphere Material - Using same values as Earth shader
     this.atmosphereMaterial = new THREE.MeshBasicNodeMaterial({
       side: THREE.BackSide,
       transparent: true,
     })
 
-    // Use the same sun direction as Earth shader
     const sunDirection = normalize(vec3(1.0, 0.2, 0.0))
 
-    // Basic variables needed for atmosphere
     const viewDirection = normalize(positionWorld.sub(cameraPosition))
     const normal = normalize(normalWorld)
 
-    // Sun orientation (dot product with atmosphere normal)
     const sunOrientation = dot(sunDirection, normal)
 
-    // Edge Alpha - atmosphere fades at edges
     let edgeAlpha = dot(viewDirection, normal)
     edgeAlpha = smoothstep(0.0, 0.8, edgeAlpha)
 
-    // Day Alpha - atmosphere fades on night side
     const dayAlpha = smoothstep(-0.3, 0.0, sunOrientation)
 
-    // Combine both alphas
     const alpha = edgeAlpha.mul(dayAlpha)
 
-    // Use EXACT same colors as Earth shader
     const atmosphereColor = vec3(0.4, 0.7, 1.0)
     const sunsetColor = vec3(1.0, 0.2, 0.2)
 
-    // Use EXACT same terminator calculation as Earth shader
     const terminatorFactor = oneMinus(smoothstep(0.0, 0.8, abs(sunOrientation)))
 
-    // Use EXACT same color mixing as Earth shader
     const dynamicGlowColor = mix(atmosphereColor, sunsetColor, terminatorFactor)
 
-    // Apply a bit more intensity since it's the atmosphere
     const finalAtmosphereColor = dynamicGlowColor.mul(1.5)
 
-    // Set material properties
     this.atmosphereMaterial.colorNode = finalAtmosphereColor
     this.atmosphereMaterial.opacityNode = alpha
 
@@ -206,28 +195,6 @@ export class Earth {
 
   setClouds() {
     this.cloudsMaterial = new THREE.MeshBasicNodeMaterial({ transparent: true })
-
-    this.cloudsMaterialTime = uniform(0)
-
-    const cloudMovementSpeed = 0.004
-
-    this.animatedUV = uv().add(
-      vec2(this.cloudsMaterialTime.mul(cloudMovementSpeed), 0),
-    )
-    const simplexNoiseTexture = texture(
-      this.simplexNoiseTexture,
-      this.animatedUV,
-    )
-
-    const displacement = vec3(simplexNoiseTexture.rgb).mul(0.05)
-
-    const normal = normalWorld
-    const tangentialDisplacement = displacement.sub(
-      normal.mul(dot(displacement, normal)),
-    )
-
-    const displacedPosition = positionWorld.add(tangentialDisplacement)
-    this.cloudsMaterial.positionNode = displacedPosition.normalize().mul(1.002)
 
     this.cloudsMaterial.colorNode = color(vec3(1))
 
@@ -248,7 +215,5 @@ export class Earth {
   update(deltaTime, elapsedTime) {
     // this.earth.rotateY(deltaTime * 0.0001)
     // this.clouds.rotateY(deltaTime * 0.0001)
-
-    this.cloudsMaterialTime.value = elapsedTime
   }
 }

@@ -45,7 +45,7 @@ export class Flights {
     const flightsCount = flightsArray.length
 
     //Geometry
-    this.flightGeometry = new THREE.SphereGeometry(0.002, 12, 12)
+    this.flightGeometry = new THREE.SphereGeometry(0.002, 3, 3)
 
     //Material
     this.flightMaterial = new THREE.MeshBasicNodeMaterial({
