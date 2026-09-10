@@ -8,16 +8,13 @@ import { Loaders } from "./Loaders"
 import { PostProcessing } from "./PostProcessing"
 import { Earth } from "./Earth"
 import { Flights } from "./Flights"
-import { Pane } from "tweakpane"
 import { TimeModule } from "./TimeModule"
 import { Sun } from "./Sun"
 import { Environment } from "./Environment"
 
-const pane = new Pane()
-
-const stats = new Stats()
-stats.showPanel(0)
-document.body.appendChild(stats.dom)
+// const stats = new Stats()
+// stats.showPanel(0)
+// document.body.appendChild(stats.dom)
 
 export const canvas = document.querySelector("canvas.webgl")
 
@@ -47,7 +44,7 @@ const clock = new THREE.Clock()
 let lastTime = performance.now()
 
 const tick = () => {
-  stats.begin()
+  // stats.begin()
 
   const elapsedTime = clock.getElapsedTime()
 
@@ -67,11 +64,9 @@ const tick = () => {
   // renderer.renderer.renderAsync(scene, camera.camera)
   postProcessing.postProcessing.renderAsync()
 
-  //setTimeout(() => {
   window.requestAnimationFrame(tick)
-  //}, 1000 / 30)
 
-  stats.end()
+  // stats.end()
 }
 
 tick()

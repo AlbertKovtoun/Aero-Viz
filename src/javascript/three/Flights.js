@@ -7,7 +7,7 @@ import { scene, timeModule } from "./Experience"
 
 export class Flights {
   constructor() {
-    this.radius = 1.02
+    this.radius = 1.01
     this.activeFlights = new Set()
     this.loadFlightData()
   }
@@ -53,7 +53,6 @@ export class Flights {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     })
-    //this.flightMaterial.colorNode = attribute("aInstanceColor")
     this.flightMaterial.colorNode = vec3(1.0)
     this.flightMaterial.opacityNode = attribute("aOpacity")
 
@@ -74,9 +73,6 @@ export class Flights {
     this.flightProgresses = new Float32Array(flightsCount)
     this.durations = new Float32Array(flightsCount)
 
-    this.flightColors = new Float32Array(flightsCount * 3)
-    this.flightTempColor = new THREE.Color()
-
     this.flightOpacities = new Float32Array(flightsCount)
 
     this.flightDummy = new THREE.Object3D()
@@ -84,7 +80,7 @@ export class Flights {
     for (let i = 0; i < flightsCount; i++) {
       const flight = flightsArray[i]
 
-      const randomAltitude = Math.random() * 0.1
+      const randomAltitude = Math.random() * 0.3
 
       const departure = this.latLongToVector3(
         flight.departure.lat,
@@ -113,13 +109,7 @@ export class Flights {
       this.rotationAngles.push(rotationAngle)
 
       this.flightProgresses[i] = 0
-      this.durations[i] = Math.random() * 15 + 5 // Random duration between 5 and 20 seconds
-
-      const randomTint = Math.random()
-      this.flightTempColor.set(randomTint, randomTint, randomTint) //random tint
-      this.flightColors[i * 3 + 0] = this.flightTempColor.r
-      this.flightColors[i * 3 + 1] = this.flightTempColor.g
-      this.flightColors[i * 3 + 2] = this.flightTempColor.b
+      this.durations[i] = flightsArray[i].duration * 20
 
       this.flightOpacities[i] = 0
 
@@ -129,11 +119,6 @@ export class Flights {
       this.flightDummy.updateMatrix()
       this.flightsInstance.setMatrixAt(i, this.flightDummy.matrix)
     }
-
-    this.flightsInstance.geometry.setAttribute(
-      "aInstanceColor",
-      new THREE.InstancedBufferAttribute(this.flightColors, 3),
-    )
 
     this.flightsInstance.geometry.setAttribute(
       "aOpacity",
