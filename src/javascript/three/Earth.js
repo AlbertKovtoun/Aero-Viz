@@ -206,14 +206,14 @@ export class Earth {
     )
 
     this.clouds = new THREE.Mesh(
-      new THREE.SphereGeometry(1.005, 64, 64),
+      new THREE.SphereGeometry(1.002, 64, 64),
       this.cloudsMaterial,
     )
     scene.add(this.clouds)
   }
 
   update(deltaTime, elapsedTime) {
-    // this.earth.rotateY(deltaTime * 0.0001)
-    // this.clouds.rotateY(deltaTime * 0.0001)
+    this.earth.rotateY(deltaTime * 0.0001)
+    this.clouds.rotateY(deltaTime * 0.0001)
   }
 }

@@ -8,6 +8,8 @@ export class Loaders {
 
     this.textureLoader = new THREE.TextureLoader()
 
+    this.cubeTextureLoader = new THREE.CubeTextureLoader()
+
     this.rgbeLoader = new RGBELoader()
 
     this.gltfLoader = new GLTFLoader(this.gltfLoader)

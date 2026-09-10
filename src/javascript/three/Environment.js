@@ -6,8 +6,20 @@ export class Environment {
     // loaders.rgbeLoader.load("/envmap/map.hdr", (environmentMap) => {
     //   environmentMap.mapping = THREE.EquirectangularReflectionMapping
     //
-    //   scene.environment = environmentMap
+    //   // scene.environment = environmentMap
     //   scene.background = environmentMap
     // })
+
+    loaders.cubeTextureLoader.setPath("/envmap/")
+
+    this.environmentTexture = loaders.cubeTextureLoader.load([
+      "px.png",
+      "nx.png",
+      "py.png",
+      "ny.png",
+      "pz.png",
+      "nz.png",
+    ])
+    scene.background = this.environmentTexture
   }
 }

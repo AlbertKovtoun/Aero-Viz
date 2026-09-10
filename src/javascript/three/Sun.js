@@ -5,13 +5,13 @@ import { color, mul } from "three/tsl"
 export class Sun {
   constructor() {
     const sunMaterial = new THREE.MeshStandardNodeMaterial({})
-    sunMaterial.emissiveNode = color("#FFCC33").mul(5)
+    sunMaterial.emissiveNode = color("#FFCC33").mul(2)
 
     const sun = new THREE.Mesh(
       new THREE.SphereGeometry(0.5, 64, 64),
       sunMaterial,
     )
-    sun.position.set(50, 0, 0)
+    sun.position.set(80, 0, 0)
     scene.add(sun)
   }
 }
