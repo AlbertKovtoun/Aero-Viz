@@ -73,12 +73,6 @@ export class Earth {
     )
     this.cloudsTexture.colorSpace = THREE.SRGBColorSpace
     this.cloudsTexture.anisotropy = 8
-
-    this.simplexNoiseTexture = loaders.textureLoader.load(
-      "/textures/simplex-noise.jpg",
-    )
-    this.simplexNoiseTexture.wrapS = THREE.RepeatWrapping
-    this.simplexNoiseTexture.wrapT = THREE.RepeatWrapping
   }
 
   setEarth() {
@@ -121,7 +115,6 @@ export class Earth {
     fresnel = pow(fresnel, 2.0)
 
     const atmosphereColor = vec3(0.4, 0.7, 1.0)
-    // const sunsetColor = vec3(1.0, 0.2, 0.2)
     const sunsetColor = color("#f09d4a")
 
     const terminatorFactor = oneMinus(smoothstep(0.0, 0.8, abs(sunLight)))
@@ -135,7 +128,6 @@ export class Earth {
     let specular = specularColor.mul(phongValue.mul(roughnessMap.add(0.05)))
 
     const finalColor = diffuse.rgb.add(specular).add(fresnel)
-    // const finalColor = vec3(finalNormal)
 
     this.earthMaterial.colorNode = finalColor
 
@@ -144,8 +136,6 @@ export class Earth {
       1.0,
       nightColor.mul(oneMinus(nightOcclusion)),
     )
-
-    // this.earthMaterial.emissiveNode = fresnel.mul(4)
 
     this.earth = new THREE.Mesh(
       new THREE.SphereGeometry(1, 64, 64),

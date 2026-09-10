@@ -30,7 +30,6 @@ export class Camera {
 
     this.controls.rotateSpeed = 0.7
     this.controls.zoomSpeed = 0.8
-    this.controls.panSpeed = 0.6
 
     this.controls.minDistance = 3
     this.controls.maxDistance = 10

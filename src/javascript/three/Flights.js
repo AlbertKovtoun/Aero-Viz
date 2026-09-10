@@ -9,6 +9,10 @@ export class Flights {
   constructor() {
     this.radius = 1.01
     this.activeFlights = new Set()
+    this.airborneFlightsCount = 0
+    this.airborneFlightsModule = document.querySelector(
+      ".airborne-flights-module",
+    )
     this.loadFlightData()
   }
 
@@ -151,6 +155,8 @@ export class Flights {
 
     this.handleFlightOpacity(flightIndex, 1)
 
+    this.airborneFlightsCount += 1
+
     //Animate flight
     gsap.to(this.flightProgresses, {
       [flightIndex]: 1,
@@ -171,7 +177,10 @@ export class Flights {
 
         this.flightsInstance.instanceMatrix.needsUpdate = true
       },
-      onComplete: () => this.handleFlightOpacity(flightIndex, 0),
+      onComplete: () => {
+        this.handleFlightOpacity(flightIndex, 0)
+        this.airborneFlightsCount -= 1
+      },
     })
   }
 
@@ -186,7 +195,12 @@ export class Flights {
     })
   }
 
+  updateAirborneFlights() {
+    this.airborneFlightsModule.textContent = `Airborne flights: ${this.airborneFlightsCount}`
+  }
+
   update(deltaTime) {
     this.flightsInstance.rotateY(deltaTime * 0.0001)
+    this.updateAirborneFlights()
   }
 }
