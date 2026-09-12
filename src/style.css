@@ -10,18 +10,85 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    user-select: none;
 }
 
 @layer components {
 
     .time-module,
-    .airborne-flights-module {
+    .airborne-flights-module,
+    .loading-screen {
         font-family: 'JetBrains Mono', monospace;
         font-feature-settings: 'zero' 0;
 
         @apply antialiased tracking-tight font-medium;
     }
 }
+
+.loading-screen {
+    position: absolute;
+
+    width: 100vw;
+    height: 100vh;
+
+    background-color: black;
+
+    color: white;
+
+    display: grid;
+    place-items: center;
+
+    z-index: 99;
+
+
+    transition: opacity 1s ease-in-out;
+}
+
+
+.loading-screen img {
+    width: 200px;
+
+    animation: bounce 0.5s infinite alternate;
+}
+
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(-10px);
+    }
+}
+
+.loading-screen-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    width: 100%;
+}
+
+.loading-bar-outside {
+    width: 50%;
+    height: 40px;
+    /* background-color: rgba($color: #000000, $alpha: 0); */
+
+    border: white solid 6px;
+}
+
+.loading-bar-inside {
+    width: 100%;
+    height: 100%;
+
+    transform: scaleX(0);
+    transform-origin: top left;
+
+    transition: transform 1s;
+
+    background-color: white;
+}
+
 
 html {
     font-size: 62.5%;
